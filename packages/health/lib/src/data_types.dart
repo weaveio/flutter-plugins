@@ -184,6 +184,8 @@ const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
   HealthDataType.SLEEP_ASLEEP: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_AWAKE: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_DEEP: HealthDataUnit.MINUTE,
+  HealthDataType.SLEEP_CORE: HealthDataUnit.MINUTE,
+  HealthDataType.SLEEP_UNSPECIFIED: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_REM: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_OUT_OF_BED: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_LIGHT: HealthDataUnit.MINUTE,

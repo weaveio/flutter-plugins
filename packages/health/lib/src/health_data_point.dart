@@ -37,7 +37,8 @@ class HealthDataPoint {
         type == HealthDataType.SLEEP_DEEP ||
         type == HealthDataType.SLEEP_LIGHT ||
         type == HealthDataType.SLEEP_REM ||
-        type == HealthDataType.SLEEP_OUT_OF_BED) {
+        type == HealthDataType.SLEEP_UNSPECIFIED ||
+        type == HealthDataType.SLEEP_CORE) {
       this._value = _convertMinutes();
     }
   }

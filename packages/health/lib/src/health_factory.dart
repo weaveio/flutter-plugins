@@ -544,14 +544,16 @@ class HealthFactory {
     switch (type) {
       case HealthDataType.SLEEP_IN_BED:
         return 0;
-      case HealthDataType.SLEEP_ASLEEP:
+      case HealthDataType.SLEEP_UNSPECIFIED:
         return 1;
-      case HealthDataType.SLEEP_AWAKE:
+      case HealthDataType.AWAKE:
         return 2;
-      case HealthDataType.SLEEP_DEEP:
+      case HealthDataType.SLEEP_CORE:
         return 3;
-      case HealthDataType.SLEEP_REM:
+      case HealthDataType.SLEEP_DEEP:
         return 4;
+      case HealthDataType.SLEEP_REM:
+        return 5;
       case HealthDataType.HEADACHE_UNSPECIFIED:
         return 0;
       case HealthDataType.HEADACHE_NOT_PRESENT:
