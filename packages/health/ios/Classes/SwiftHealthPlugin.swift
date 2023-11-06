@@ -535,6 +535,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         if dataTypeKey == self.SLEEP_REM {
           samplesCategory = samplesCategory.filter { $0.value == 5 }
         }
+        // headache
         if dataTypeKey == self.HEADACHE_UNSPECIFIED {
           samplesCategory = samplesCategory.filter { $0.value == 0 }
         }
