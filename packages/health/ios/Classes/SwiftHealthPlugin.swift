@@ -54,6 +54,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
   let SLEEP_DEEP = "SLEEP_DEEP"
   let SLEEP_REM = "SLEEP_REM"
   let SLEEP_CORE = "SLEEP_CORE"
+  let VO2MAX = "VO2MAX"
 
   let EXERCISE_TIME = "EXERCISE_TIME"
   let WORKOUT = "WORKOUT"
@@ -114,6 +115,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
   let RESPIRATIONS_PER_MINUTE = "RESPIRATIONS_PER_MINUTE"
   let MILLIGRAM_PER_DECILITER = "MILLIGRAM_PER_DECILITER"
   let UNKNOWN_UNIT = "UNKNOWN_UNIT"
+  let VO2MAX_UNIT = "VO2MAX_UNIT"
   let NO_UNIT = "NO_UNIT"
 
   struct PluginError: Error {
@@ -772,6 +774,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
     unitDict[BEATS_PER_MINUTE] = HKUnit.init(from: "count/min")
     unitDict[RESPIRATIONS_PER_MINUTE] = HKUnit.init(from: "count/min")
     unitDict[MILLIGRAM_PER_DECILITER] = HKUnit.init(from: "mg/dL")
+    unitDict[VO2MAX_UNIT] = HKUnit.init(from: "ml/kg*min")
     unitDict[UNKNOWN_UNIT] = HKUnit.init(from: "")
     unitDict[NO_UNIT] = HKUnit.init(from: "")
 
@@ -914,6 +917,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
       dataTypesDict[SLEEP_AWAKE] = HKSampleType.categoryType(forIdentifier: .sleepAnalysis)!
       dataTypesDict[SLEEP_DEEP] = HKSampleType.categoryType(forIdentifier: .sleepAnalysis)!
       dataTypesDict[SLEEP_REM] = HKSampleType.categoryType(forIdentifier: .sleepAnalysis)!
+      dataTypesDict[VO2MAX] = HKSampleType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!
 
       dataTypesDict[EXERCISE_TIME] = HKSampleType.quantityType(forIdentifier: .appleExerciseTime)!
       dataTypesDict[WORKOUT] = HKSampleType.workoutType()

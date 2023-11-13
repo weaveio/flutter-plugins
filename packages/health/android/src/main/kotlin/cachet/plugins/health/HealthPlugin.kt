@@ -91,8 +91,8 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
     private var BASAL_ENERGY_BURNED = "BASAL_ENERGY_BURNED"
     private var FLIGHTS_CLIMBED = "FLIGHTS_CLIMBED"
     private var RESPIRATORY_RATE = "RESPIRATORY_RATE"
+    private var VO2MAX = "VO2MAX"
 
-    // TODO support unknown?
     private var SLEEP_ASLEEP = "SLEEP_ASLEEP"
     private var SLEEP_AWAKE = "SLEEP_AWAKE"
     private var SLEEP_IN_BED = "SLEEP_IN_BED"
@@ -1795,6 +1795,15 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                     "source_name" to metadata.dataOrigin.packageName,
                 )
             )
+            is Vo2MaxRecord -> return listOf(
+                mapOf<String, Any>(
+                    "value" to record.vo2MillilitersPerMinuteKilogram,
+                    "date_from" to record.time.toEpochMilli(),
+                    "date_to" to record.time.toEpochMilli(),
+                    "source_id" to "",
+                    "source_name" to metadata.dataOrigin.packageName,
+                )
+            )
             // is ExerciseSessionRecord -> return listOf(mapOf<String, Any>("value" to ,
             //                                             "date_from" to ,
             //                                             "date_to" to ,
@@ -1950,6 +1959,11 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
             RESPIRATORY_RATE -> RespiratoryRateRecord(
                 time = Instant.ofEpochMilli(startTime),
                 rate = value,
+                zoneOffset = null,
+            )
+            VO2MAX -> Vo2MaxRecord(
+                time = Instant.ofEpochMilli(startTime),
+                vo2MillilitersPerMinuteKilogram = value,
                 zoneOffset = null,
             )
             // AGGREGATE_STEP_COUNT -> StepsRecord()
@@ -2118,6 +2132,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
         BASAL_ENERGY_BURNED to BasalMetabolicRateRecord::class,
         FLIGHTS_CLIMBED to FloorsClimbedRecord::class,
         RESPIRATORY_RATE to RespiratoryRateRecord::class,
+        VO2MAX to Vo2MaxRecord::class,
         // MOVE_MINUTES to TODO: Find alternative?
         // TODO: Implement remaining types
         // "ActiveCaloriesBurned" to ActiveCaloriesBurnedRecord::class,
@@ -2153,7 +2168,6 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
         // "StepsCadence" to StepsCadenceRecord::class,
         // "Steps" to StepsRecord::class,
         // "TotalCaloriesBurned" to TotalCaloriesBurnedRecord::class,
-        // "Vo2Max" to Vo2MaxRecord::class,
         // "Weight" to WeightRecord::class,
         // "WheelchairPushes" to WheelchairPushesRecord::class,
     )

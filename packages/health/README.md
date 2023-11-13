@@ -22,53 +22,54 @@ Note that for Android, the target phone **needs** to have [Google Fit](https://w
 ## Data Types
 
 | **Data Type**               | **Unit**                | **iOS** | **Android (Google Fit)** | **Android (Health Connect)** | **Comments**                           |
-| --------------------------- | ----------------------- | ------- | ------------------------ |------------------------------| -------------------------------------- |
-| ACTIVE_ENERGY_BURNED        | CALORIES                | yes     | yes                      | yes                          |                                        |
-| BASAL_ENERGY_BURNED         | CALORIES                | yes     |                          | yes                          |                                        |
-| BLOOD_GLUCOSE               | MILLIGRAM_PER_DECILITER | yes     | yes                      | yes                          |                                        |
-| BLOOD_OXYGEN                | PERCENTAGE              | yes     | yes                      | yes                          |                                        |
-| BLOOD_PRESSURE_DIASTOLIC    | MILLIMETER_OF_MERCURY   | yes     | yes                      | yes                          |                                        |
-| BLOOD_PRESSURE_SYSTOLIC     | MILLIMETER_OF_MERCURY   | yes     | yes                      | yes                          |                                        |
-| BODY_FAT_PERCENTAGE         | PERCENTAGE              | yes     | yes                      | yes                          |                                        |
-| BODY_MASS_INDEX             | NO_UNIT                 | yes     | yes                      | yes                          |                                        |
-| BODY_TEMPERATURE            | DEGREE_CELSIUS          | yes     | yes                      | yes                          |                                        |
-| ELECTRODERMAL_ACTIVITY      | SIEMENS                 | yes     |                          |                              |                                        |
-| HEART_RATE                  | BEATS_PER_MINUTE        | yes     | yes                      | yes                          |                                        |
-| HEIGHT                      | METERS                  | yes     | yes                      | yes                          |                                        |
-| RESTING_HEART_RATE          | BEATS_PER_MINUTE        | yes     |                          | yes                          |                                        |
-| RESPIRATORY_RATE            | RESPIRATIONS_PER_MINUTE | yes     |                          | yes                                                                   |
-| PERIPHERAL_PERFUSION_INDEX  | PERCENTAGE              | yes     |                          |                                                             |
-| STEPS                       | COUNT                   | yes     | yes                      | yes                          |                                        |
-| WAIST_CIRCUMFERENCE         | METERS                  | yes     |                          |                              |                                        |
-| WALKING_HEART_RATE          | BEATS_PER_MINUTE        | yes     |                          |                              |                                        |
-| WEIGHT                      | KILOGRAMS               | yes     | yes                      | yes                          |                                        |
-| DISTANCE_WALKING_RUNNING    | METERS                  | yes     |                          |                              |                                        |
-| FLIGHTS_CLIMBED             | COUNT                   | yes     |                          | yes                          |                                        |
-| MOVE_MINUTES                | MINUTES                 |         | yes                      |                              |                                        |
-| DISTANCE_DELTA              | METERS                  |         | yes                      | yes                          |                                        |
-| MINDFULNESS                 | MINUTES                 | yes     |                          |                              |                                        |
-| SLEEP_IN_BED                | MINUTES                 | yes     |                          |                              |                                        |
-| SLEEP_ASLEEP                | MINUTES                 | yes     |                          | yes                          |                                        |
-| SLEEP_AWAKE                 | MINUTES                 | yes     |                          | yes                          |                                        |
-| SLEEP_DEEP                  | MINUTES                 | yes     |                          | yes                          |                                        |
-| SLEEP_LIGHT                 | MINUTES                 |         |                          | yes                          |                                        |
-| SLEEP_REM                   | MINUTES                 | yes     |                          | yes                          |                                        |
-| SLEEP_OUT_OF_BED            | MINUTES                 |         |                          | yes                          |                                        |
-| SLEEP_SESSION               | MINUTES                 |         |                          | yes                          |                                        |
-| WATER                       | LITER                   | yes     | yes                      | yes                          |                                        |
-| EXERCISE_TIME               | MINUTES                 | yes     |                          |                              |                                        |
-| WORKOUT                     | NO_UNIT                 | yes     | yes                      | yes                          | (Has other workout types)              |
-| HIGH_HEART_RATE_EVENT       | NO_UNIT                 | yes     |                          |                              | Requires Apple Watch to write the data |
-| LOW_HEART_RATE_EVENT        | NO_UNIT                 | yes     |                          |                              | Requires Apple Watch to write the data |
-| IRREGULAR_HEART_RATE_EVENT  | NO_UNIT                 | yes     |                          |                              | Requires Apple Watch to write the data |
-| HEART_RATE_VARIABILITY_SDNN | MILLISECONDS            | yes     |                          |                              | Requires Apple Watch to write the data |
-| HEADACHE_NOT_PRESENT        | MINUTES                 | yes     |                          |                              |                                        |
-| HEADACHE_MILD               | MINUTES                 | yes     |                          |                              |                                        |
-| HEADACHE_MODERATE           | MINUTES                 | yes     |                          |                              |                                        |
-| HEADACHE_SEVERE             | MINUTES                 | yes     |                          |                              |                                        |
-| HEADACHE_UNSPECIFIED        | MINUTES                 | yes     |                          |                              |                                        |
-| AUDIOGRAM                   | DECIBEL_HEARING_LEVEL   | yes     |                          |                              |                                        |
-| ELECTROCARDIOGRAM           | VOLT                    | yes     |                          |                              | Requires Apple Watch to write the data |
+| --------------------------- | ----------------------- |--------| ------------------------ |------------------------------| -------------------------------------- |
+| ACTIVE_ENERGY_BURNED        | CALORIES                | yes    | yes                      | yes                          |                                        |
+| BASAL_ENERGY_BURNED         | CALORIES                | yes    |                          | yes                          |                                        |
+| BLOOD_GLUCOSE               | MILLIGRAM_PER_DECILITER | yes    | yes                      | yes                          |                                        |
+| BLOOD_OXYGEN                | PERCENTAGE              | yes    | yes                      | yes                          |                                        |
+| BLOOD_PRESSURE_DIASTOLIC    | MILLIMETER_OF_MERCURY   | yes    | yes                      | yes                          |                                        |
+| BLOOD_PRESSURE_SYSTOLIC     | MILLIMETER_OF_MERCURY   | yes    | yes                      | yes                          |                                        |
+| BODY_FAT_PERCENTAGE         | PERCENTAGE              | yes    | yes                      | yes                          |                                        |
+| BODY_MASS_INDEX             | NO_UNIT                 | yes    | yes                      | yes                          |                                        |
+| BODY_TEMPERATURE            | DEGREE_CELSIUS          | yes    | yes                      | yes                          |                                        |
+| ELECTRODERMAL_ACTIVITY      | SIEMENS                 | yes    |                          |                              |                                        |
+| HEART_RATE                  | BEATS_PER_MINUTE        | yes    | yes                      | yes                          |                                        |
+| HEIGHT                      | METERS                  | yes    | yes                      | yes                          |                                        |
+| RESTING_HEART_RATE          | BEATS_PER_MINUTE        | yes    |                          | yes                          |                                        |
+| RESPIRATORY_RATE            | RESPIRATIONS_PER_MINUTE | yes    |                          | yes                                                                   |
+| PERIPHERAL_PERFUSION_INDEX  | PERCENTAGE              | yes    |                          |                                                             |
+| STEPS                       | COUNT                   | yes    | yes                      | yes                          |                                        |
+| WAIST_CIRCUMFERENCE         | METERS                  | yes    |                          |                              |                                        |
+| WALKING_HEART_RATE          | BEATS_PER_MINUTE        | yes    |                          |                              |                                        |
+| WEIGHT                      | KILOGRAMS               | yes    | yes                      | yes                          |                                        |
+| DISTANCE_WALKING_RUNNING    | METERS                  | yes    |                          |                              |                                        |
+| FLIGHTS_CLIMBED             | COUNT                   | yes    |                          | yes                          |                                        |
+| MOVE_MINUTES                | MINUTES                 |        | yes                      |                              |                                        |
+| DISTANCE_DELTA              | METERS                  |        | yes                      | yes                          |                                        |
+| MINDFULNESS                 | MINUTES                 | yes    |                          |                              |                                        |
+| SLEEP_IN_BED                | MINUTES                 | yes    |                          |                              |                                        |
+| SLEEP_ASLEEP                | MINUTES                 | yes    |                          | yes                          |                                        |
+| SLEEP_AWAKE                 | MINUTES                 | yes    |                          | yes                          |                                        |
+| SLEEP_DEEP                  | MINUTES                 | yes    |                          | yes                          |                                        |
+| SLEEP_LIGHT                 | MINUTES                 |        |                          | yes                          |                                        |
+| SLEEP_REM                   | MINUTES                 | yes    |                          | yes                          |                                        |
+| SLEEP_OUT_OF_BED            | MINUTES                 |        |                          | yes                          |                                        |
+| SLEEP_SESSION               | MINUTES                 |        |                          | yes                          |                                        |
+| WATER                       | LITER                   | yes    | yes                      | yes                          |                                        |
+| EXERCISE_TIME               | MINUTES                 | yes    |                          |                              |                                        |
+| WORKOUT                     | NO_UNIT                 | yes    | yes                      | yes                          | (Has other workout types)              |
+| HIGH_HEART_RATE_EVENT       | NO_UNIT                 | yes    |                          |                              | Requires Apple Watch to write the data |
+| LOW_HEART_RATE_EVENT        | NO_UNIT                 | yes    |                          |                              | Requires Apple Watch to write the data |
+| IRREGULAR_HEART_RATE_EVENT  | NO_UNIT                 | yes    |                          |                              | Requires Apple Watch to write the data |
+| HEART_RATE_VARIABILITY_SDNN | MILLISECONDS            | yes    |                          |                              | Requires Apple Watch to write the data |
+| HEADACHE_NOT_PRESENT        | MINUTES                 | yes    |                          |                              |                                        |
+| HEADACHE_MILD               | MINUTES                 | yes    |                          |                              |                                        |
+| HEADACHE_MODERATE           | MINUTES                 | yes    |                          |                              |                                        |
+| HEADACHE_SEVERE             | MINUTES                 | yes    |                          |                              |                                        |
+| HEADACHE_UNSPECIFIED        | MINUTES                 | yes    |                          |                              |                                        |
+| AUDIOGRAM                   | DECIBEL_HEARING_LEVEL   | yes    |                          |                              |                                        |
+| ELECTROCARDIOGRAM           | VOLT                    | yes    |                          |                              | Requires Apple Watch to write the data |
+| VO2MAX | VO2MAX_UNIT | yes    | | yes | |
 
 ## Setup
 
