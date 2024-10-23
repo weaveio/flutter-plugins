@@ -1,19 +1,23 @@
-part of mobility_features;
+part of '../mobility_features.dart';
 
 /// Main entry for configuring and listening for mobility features.
-/// Used as a singleton `MobilityFactory()`.
+/// Used as a singleton `MobilityFeatures()`.
 class MobilityFeatures {
+  static final MobilityFeatures _instance = MobilityFeatures._();
+
   double _stopRadius = 5, _placeRadius = 50;
   Duration _stopDuration = const Duration(seconds: 20);
 
+  final _streamController = StreamController<MobilityContext>.broadcast();
   StreamSubscription<LocationSample>? _subscription;
-  _MobilitySerializer<LocationSample>? _serializerSamples;
-  late _MobilitySerializer<Stop> _serializerStops;
-  late _MobilitySerializer<Move> _serializerMoves;
+  MobilitySerializer<LocationSample>? _serializerSamples;
+  late MobilitySerializer<Stop> _serializerStops;
+  late MobilitySerializer<Move> _serializerMoves;
   List<Stop> _stops = [];
   List<Move> _moves = [];
   List<Place> _places = [];
-  List<LocationSample> _cluster = [], _buffer = [], _samples = [];
+  List<LocationSample> _cluster = [];
+  final List<LocationSample> _buffer = [], _samples = [];
   int _saveEvery = 10;
   bool debug = false;
 
@@ -23,25 +27,31 @@ class MobilityFeatures {
     }
   }
 
-  // Outgoing stream
-  StreamController<MobilityContext> _streamController =
-      StreamController<MobilityContext>.broadcast();
-
-  Stream<MobilityContext> get contextStream => _streamController.stream;
-
   // Private constructor
-  MobilityFeatures._();
+  MobilityFeatures._() {
+    FromJsonFactory().registerAll([
+      GeoLocation(0, 0),
+      LocationSample(GeoLocation(0, 0), DateTime.now()),
+      Stop(GeoLocation(0, 0), DateTime.now(), DateTime.now()),
+      Place(0, []),
+      Move(Stop(GeoLocation(0, 0), DateTime.now(), DateTime.now()),
+          Stop(GeoLocation(0, 0), DateTime.now(), DateTime.now()))
+    ]);
+  }
 
-  // Private Singleton field
-  static final MobilityFeatures _instance = MobilityFeatures._();
-
-  /// Public getter for the Singleton instance
+  /// Singleton instance of MobilityFeatures.
   factory MobilityFeatures() => _instance;
 
-  /// Listen to a Stream of [LocationSample].
-  /// The subscription will be stored as a [StreamSubscription]
-  /// which may be cancelled later.
-  Future startListening(Stream<LocationSample> stream) async {
+  /// A stream of generated mobility context objects.
+  Stream<MobilityContext> get contextStream => _streamController.stream;
+
+  /// Start listening to the [stream] of [LocationSample] updates.
+  /// This will start calculating [MobilityContext] instances, which will be
+  /// delivered on the [contextStream] stream.
+  ///
+  /// Use [stopListening] to stop listening to the location stream and hence stop
+  /// generating mobility context objects.
+  Future<void> startListening(Stream<LocationSample> stream) async {
     await _handleInit();
 
     if (_subscription != null) {
@@ -52,9 +62,9 @@ class MobilityFeatures {
 
   Future<void> _handleInit() async {
     _serializerSamples =
-        _serializerSamples = _MobilitySerializer<LocationSample>();
-    _serializerStops = _MobilitySerializer<Stop>();
-    _serializerMoves = _MobilitySerializer<Move>();
+        _serializerSamples = MobilitySerializer<LocationSample>();
+    _serializerStops = MobilitySerializer<Stop>();
+    _serializerMoves = MobilitySerializer<Move>();
 
     _stops = (await _serializerStops.load() as List<Stop>);
     _moves = (await _serializerMoves.load() as List<Move>);
@@ -62,8 +72,9 @@ class MobilityFeatures {
     _stops = uniqueElements(_stops) as List<Stop>;
     _moves = uniqueElements(_moves) as List<Move>;
 
-    if (_cluster.isNotEmpty)
+    if (_cluster.isNotEmpty) {
       _print('Loaded ${_cluster.length} location samples from disk');
+    }
     if (_stops.isNotEmpty) {
       _print('Loaded ${_stops.length} stops from disk');
     }
@@ -71,24 +82,26 @@ class MobilityFeatures {
       _print('Loaded ${_moves.length} moves from disk');
     }
 
-    for (var s in _stops) _print(s);
-
     if (_stops.isNotEmpty) {
       /// Only keeps stops and moves from the last known date
-      DateTime date = _stops.last.datetime.midnight;
+      DateTime date = _stops.last.dateTime.midnight;
       _stops = _getElementsForDate(_stops, date) as List<Stop>;
       _moves = _getElementsForDate(_moves, date) as List<Move>;
       _places = _findPlaces(_stops, placeRadius: _placeRadius);
 
       // Compute features
-      MobilityContext context =
-          MobilityContext._(_stops, _places, _moves, date);
+      MobilityContext context = MobilityContext.fromMobility(
+        date,
+        _stops,
+        _places,
+        _moves,
+      );
       _streamController.add(context);
     }
   }
 
   /// Cancel the [StreamSubscription] and stop listening.
-  Future stopListening() async {
+  Future<void> stopListening() async {
     if (_subscription != null) {
       await _subscription!.cancel();
     }
@@ -111,7 +124,7 @@ class MobilityFeatures {
     // If previous samples exist, check if we should compute anything
     if (_cluster.isNotEmpty) {
       // If previous sample was on a different date, reset everything
-      if (_cluster.last.datetime.midnight != sample.datetime.midnight) {
+      if (_cluster.last.dateTime.midnight != sample.dateTime.midnight) {
         _createStopAndResetCluster();
         _clearEverything();
       }
@@ -122,7 +135,7 @@ class MobilityFeatures {
         GeoLocation centroid = _computeCentroid(_cluster);
 
         // If the new data point is far away from cluster, make stop
-        if (Distance.fromGeospatial(centroid, sample) > _stopRadius) {
+        if (Distance.fromGeoSpatial(centroid, sample) > _stopRadius) {
           _createStopAndResetCluster();
         }
       }
@@ -133,28 +146,28 @@ class MobilityFeatures {
 
   void _clearEverything() {
     _print('cleared');
-    _serializerStops.flush();
-    _serializerMoves.flush();
-    _stops = [];
-    _moves = [];
-    _places = [];
-    _cluster = [];
-    _buffer = [];
+    _serializerStops.clear();
+    _serializerMoves.clear();
+    _stops.clear();
+    _moves.clear();
+    _places.clear();
+    _cluster.clear();
+    _buffer.clear();
   }
 
   /// Save a sample to the buffer and store samples on disk if buffer overflows
   void _addToBuffer(LocationSample sample) {
     _buffer.add(sample);
     if (_buffer.length >= _saveEvery) {
-      _serializerSamples!.save(_buffer);
+      _serializerSamples!.append(_buffer);
       _print('Stored buffer to disk');
-      _buffer = [];
+      _buffer.clear();
     }
   }
 
   /// Converts the cluster into a stop, i.e. closing the cluster
   void _createStopAndResetCluster() {
-    Stop s = Stop._fromLocationSamples(_cluster);
+    Stop s = Stop.fromLocationSamples(_cluster);
 
     // If the stop is too short, it is discarded
     // Otherwise compute a context and send it via the stream
@@ -172,28 +185,32 @@ class MobilityFeatures {
       _places = _findPlaces(_stops);
 
       // Store to disk
-      _serializerStops.flush();
-      _serializerStops.save(_stops);
+      _serializerStops.clear();
+      _serializerStops.append(_stops);
 
       // Extract date
-      DateTime date = _cluster.last.datetime.midnight;
+      DateTime date = _cluster.last.dateTime.midnight;
 
       if (stopPrev != null) {
         _moves = _findMoves(_stops, _samples);
-        _serializerMoves.flush();
-        _serializerMoves.save(_moves);
+        _serializerMoves.clear();
+        _serializerMoves.append(_moves);
       }
 
       // Compute features
-      MobilityContext context =
-          MobilityContext._(_stops, _places, _moves, date);
+      MobilityContext context = MobilityContext.fromMobility(
+        date,
+        _stops,
+        _places,
+        _moves,
+      );
       _streamController.add(context);
     }
 
     // Reset samples etc
-    _cluster = [];
-    _serializerSamples!.flush();
-    _buffer = [];
+    _cluster.clear();
+    _serializerSamples!.clear();
+    _buffer.clear();
   }
 
   /// Configure the stop-duration for the stop algorithm
@@ -207,21 +224,17 @@ class MobilityFeatures {
   }
 
   /// Configure the stop-radius for the place algorithm
-  set placeRadius(value) {
-    _placeRadius = value;
-  }
+  set placeRadius(double value) => _placeRadius = value;
 
-  Future<_MobilitySerializer<LocationSample>>
+  Future<MobilitySerializer<LocationSample>>
       get _locationSampleSerializer async {
-    if (_serializerSamples == null) {
-      _serializerSamples = _MobilitySerializer<LocationSample>();
-    }
+    _serializerSamples ??= MobilitySerializer<LocationSample>();
     return _serializerSamples!;
   }
 
   Future<void> saveSamples(List<LocationSample> samples) async {
     final serializer = await _locationSampleSerializer;
-    serializer.save(samples);
+    serializer.append(samples);
   }
 
   Future<List<LocationSample>> loadSamples() async {
@@ -229,18 +242,18 @@ class MobilityFeatures {
     return (await serializer.load() as List<LocationSample>);
   }
 
-  static List<_Timestamped> _getElementsForDate(
-      List<_Timestamped> elements, DateTime date) {
-    return elements.where((e) => e.datetime.midnight == date).toList();
+  static List<Timestamped> _getElementsForDate(
+      List<Timestamped> elements, DateTime date) {
+    return elements.where((e) => e.dateTime.midnight == date).toList();
   }
 
-  static List<_Timestamped> uniqueElements(List<_Timestamped> elements) {
+  static List<Timestamped> uniqueElements(List<Timestamped> elements) {
     List<int> seen = [];
 
-    elements.sort((a, b) => a.datetime.compareTo(b.datetime));
+    elements.sort((a, b) => a.dateTime.compareTo(b.dateTime));
 
     return elements.where((e) {
-      int ms = e.datetime.millisecondsSinceEpoch;
+      int ms = e.dateTime.millisecondsSinceEpoch;
       if (!seen.contains(ms)) {
         seen.add(ms);
         return true;

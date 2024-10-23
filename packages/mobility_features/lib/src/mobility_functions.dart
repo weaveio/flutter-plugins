@@ -1,127 +1,108 @@
-part of mobility_features;
+part of '../mobility_features.dart';
 
-/// Returns an [Iterable] of [List]s where the nth element in the returned
-/// iterable contains the nth element from every Iterable in [iterables]. The
-/// returned Iterable is as long as the shortest Iterable in the argument. If
-/// [iterables] is empty, it returns an empty list.
-Iterable<List<T>> zip<T>(Iterable<Iterable<T>> iterables) sync* {
-  if (iterables.isEmpty) return;
-  final iterators = iterables.map((e) => e.iterator).toList(growable: false);
-  while (iterators.every((e) => e.moveNext())) {
-    yield iterators.map((e) => e.current).toList(growable: false);
-  }
-}
+/// Finds the places by clustering stops with the DBSCAN algorithm
+List<Place> _findPlaces(List<Stop> stops, {double placeRadius = 50.0}) {
+  List<Place> places = [];
 
-/// Convert from degrees to radians
-extension on double {
-  double get radiansFromDegrees => this * (pi / 180.0);
-}
+  DBSCAN dbscan = DBSCAN(
+      epsilon: placeRadius, minPoints: 1, distanceMeasure: Distance.fromList);
 
-Iterable<int> range(int low, int high) sync* {
-  for (int i = low; i < high; ++i) {
-    yield i;
-  }
-}
+  /// Extract gps coordinates from stops
+  List<List<double?>> stopCoordinates = stops
+      .map((s) => ([s.geoLocation.latitude, s.geoLocation.longitude]))
+      .toList();
 
-extension CompareDates on DateTime {
-  bool geq(DateTime other) {
-    return this.isAfter(other) || this.isAtSameMomentAs(other);
-  }
+  /// Run DBSCAN on stops
+  dbscan.run(stopCoordinates as List<List<double>>);
 
-  bool leq(DateTime other) {
-    return this.isBefore(other) || this.isAtSameMomentAs(other);
-  }
+  /// Extract labels for each stop, each label being a cluster
+  /// Filter out stops labelled as noise (where label is -1)
+  Set<int> clusterLabels = dbscan.label!.where((l) => (l != -1)).toSet();
 
-  DateTime get midnight {
-    return DateTime(this.year, this.month, this.day);
-  }
-}
+  for (int label in clusterLabels) {
+    /// Get indices of all stops with the current cluster label
+    List<int> indices =
+        stops.asMap().keys.where((i) => (dbscan.label![i] == label)).toList();
 
-extension AverageIterable on Iterable {
-  double? get mean {
-    return this.fold(0, (dynamic a, b) => a + b) / this.length.toDouble();
-  }
-}
+    /// For each index, get the corresponding stop
+    List<Stop> stopsForPlace = indices.map((i) => (stops[i])).toList();
 
-int argmaxDouble(List<double> list) {
-  double maxVal = -double.infinity;
-  int i = 0;
+    /// Add place to the list
+    Place p = Place(label, stopsForPlace);
+    places.add(p);
 
-  for (int j = 0; j < list.length; j++) {
-    if (list[j] > maxVal) {
-      maxVal = list[j];
-      i = j;
+    /// Set placeId field for the stops belonging to this place
+    for (var s in stopsForPlace) {
+      s.placeId = p.id;
     }
   }
-  return i;
+  return places;
 }
 
-int argmaxInt(List<int> list) {
-  int maxVal = -2147483648;
-  int i = 0;
+List<Move> _findMoves(List<Stop> stops, List<LocationSample> samples) {
+  Stop? previous;
+  List<Move> moves = [];
 
-  for (int j = 0; j < list.length; j++) {
-    if (list[j] > maxVal) {
-      maxVal = list[j];
-      i = j;
+  for (Stop current in stops) {
+    if (previous != null) {
+      final path = samples
+          .where((s) =>
+              previous!.dateTime.leq(s.dateTime) &&
+              previous.dateTime.geq(s.dateTime))
+          .toList();
+      Move m = Move.fromPath(previous, current, path);
+      moves.add(m);
     }
+    previous = current;
   }
-  return i;
+  return moves;
 }
 
-void printMatrix(List<List> m) {
-  for (List row in m) {
-    String s = '';
-    for (var e in row) {
-      s += '$e ';
-    }
-    print(s);
-  }
+GeoLocation _computeCentroid(List<GeoSpatial> data) {
+  double lat =
+      Stats.fromData(data.map((d) => (d.geoLocation.latitude)).toList()).median
+          as double;
+  double lon =
+      Stats.fromData(data.map((d) => (d.geoLocation.longitude)).toList()).median
+          as double;
+
+  return GeoLocation(lat, lon);
 }
 
-List<List<double>> zeroMatrix(int rows, int cols) {
-  return new List.generate(rows, (_) => new List<double>.filled(cols, 0.0));
-}
-
-List<Stop> _mergeStops(List<Stop> stops) {
-  List<Stop> merged = [];
-  if (stops.length < 2) return stops;
-
-  /// Should be applied after places have been found
-  List<Stop> toMerge = [];
-
-  void _merge() {
-    if (toMerge.isEmpty) return;
-    GeoLocation geoLocation = _computeCentroid(toMerge);
-    DateTime arr = toMerge.first.arrival;
-    DateTime dep = toMerge.last.departure;
-    Stop s = Stop._(geoLocation, arr, dep, placeId: toMerge.first.placeId);
-    merged.add(s);
-    toMerge = [];
-  }
-
-  for (Stop stop in stops) {
-    /// If stop is noisy, just add it to the merged list, dont do anything to it
-    if (stop.placeId == -1) {
-      merged.add(stop);
-    } else {
-      /// If no stops to merge, we cannot merge and we therefore add the current
-      /// stop and go to the next one
-      if (toMerge.isEmpty) {
-        toMerge.add(stop);
-      }
-
-      /// Otherwise check if we should add it or merge
-      else {
-        if (stop.placeId != toMerge.last.placeId) {
-          _merge();
-        }
-        toMerge.add(stop);
-      }
-    }
-  }
-
-  /// Merge remaining stops in the toMerge list
-  _merge();
-  return merged;
-}
+/// Find the stops in a sequence of gps data points
+//List<Stop> _findStops(List<LocationSample> data,
+//    {double stopRadius = 25.0,
+//    Duration stopDuration = const Duration(minutes: 3)}) {
+//  if (data.isEmpty) return [];
+//
+//  List<Stop> stops = [];
+//  int n = data.length;
+//
+//  /// Go through all the location samples, i.e from index [0...n-1]
+//  int start = 0;
+//  while (start < n) {
+//    int end = start + 1;
+//    List<LocationSample> subset = data.sublist(start, end);
+//    GeoLocation centroid = _computeCentroid(subset);
+//
+//    /// Expand cluster until either all samples have been considered,
+//    /// or the current sample lies outside the radius.
+//    while (
+//        end < n && Distance.fromGeospatial(centroid, data[end]) <= stopRadius) {
+//      end += 1;
+//      subset = data.sublist(start, end);
+//      centroid = _computeCentroid(subset);
+//    }
+//    Stop s = Stop._fromLocationSamples(subset);
+//    stops.add(s);
+//
+//    /// Update the start index, such that we no longer look at
+//    /// the previously considered data samples
+//    start = end;
+//  }
+//
+//  /// Filter out stops which are shorter than the min. duration
+//  stops = stops.where((s) => (s.duration >= stopDuration)).toList();
+//
+//  return stops;
+//}

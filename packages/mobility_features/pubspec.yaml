@@ -1,10 +1,11 @@
 name: mobility_features
 description: Calculation of real-time mobility features like places, stops, and home stay
-version: 4.0.1
+version: 6.0.0
 homepage: https://github.com/cph-cachet/flutter-plugins/
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.16.0"
 
 dependencies:
   flutter:
@@ -12,9 +13,14 @@ dependencies:
   simple_cluster: ^0.3.0
   stats: ^2.0.0
   path_provider: ^2.0.2
+  json_annotation: ^4.8.0
+  carp_serializable: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: any
+  json_serializable: any
+  build_runner: any
 
 flutter:

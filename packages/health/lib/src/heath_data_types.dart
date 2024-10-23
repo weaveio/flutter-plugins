@@ -1,8 +1,9 @@
-part of health;
+part of '../health.dart';
 
-/// List of all available data types.
+/// List of all available health data types.
 enum HealthDataType {
   ACTIVE_ENERGY_BURNED,
+  ATRIAL_FIBRILLATION_BURDEN,
   AUDIOGRAM,
   BASAL_ENERGY_BURNED,
   BLOOD_GLUCOSE,
@@ -12,14 +13,51 @@ enum HealthDataType {
   BODY_FAT_PERCENTAGE,
   BODY_MASS_INDEX,
   BODY_TEMPERATURE,
+  BODY_WATER_MASS,
   DIETARY_CARBS_CONSUMED,
+  DIETARY_CAFFEINE,
   DIETARY_ENERGY_CONSUMED,
   DIETARY_FATS_CONSUMED,
   DIETARY_PROTEIN_CONSUMED,
+  DIETARY_FIBER,
+  DIETARY_SUGAR,
+  DIETARY_FAT_MONOUNSATURATED,
+  DIETARY_FAT_POLYUNSATURATED,
+  DIETARY_FAT_SATURATED,
+  DIETARY_CHOLESTEROL,
+  DIETARY_VITAMIN_A,
+  DIETARY_THIAMIN,
+  DIETARY_RIBOFLAVIN,
+  DIETARY_NIACIN,
+  DIETARY_PANTOTHENIC_ACID,
+  DIETARY_VITAMIN_B6,
+  DIETARY_BIOTIN,
+  DIETARY_VITAMIN_B12,
+  DIETARY_VITAMIN_C,
+  DIETARY_VITAMIN_D,
+  DIETARY_VITAMIN_E,
+  DIETARY_VITAMIN_K,
+  DIETARY_FOLATE,
+  DIETARY_CALCIUM,
+  DIETARY_CHLORIDE,
+  DIETARY_IRON,
+  DIETARY_MAGNESIUM,
+  DIETARY_PHOSPHORUS,
+  DIETARY_POTASSIUM,
+  DIETARY_SODIUM,
+  DIETARY_ZINC,
+  DIETARY_CHROMIUM,
+  DIETARY_COPPER,
+  DIETARY_IODINE,
+  DIETARY_MANGANESE,
+  DIETARY_MOLYBDENUM,
+  DIETARY_SELENIUM,
   FORCED_EXPIRATORY_VOLUME,
   HEART_RATE,
   HEART_RATE_VARIABILITY_SDNN,
+  HEART_RATE_VARIABILITY_RMSSD,
   HEIGHT,
+  INSULIN_DELIVERY,
   RESTING_HEART_RATE,
   RESPIRATORY_RATE,
   PERIPHERAL_PERFUSION_INDEX,
@@ -28,21 +66,27 @@ enum HealthDataType {
   WALKING_HEART_RATE,
   WEIGHT,
   DISTANCE_WALKING_RUNNING,
+  DISTANCE_SWIMMING,
+  DISTANCE_CYCLING,
   FLIGHTS_CLIMBED,
-  MOVE_MINUTES,
   DISTANCE_DELTA,
   MINDFULNESS,
   WATER,
-  SLEEP_IN_BED,
   SLEEP_ASLEEP,
+  SLEEP_AWAKE_IN_BED,
   SLEEP_AWAKE,
-  SLEEP_LIGHT,
   SLEEP_DEEP,
-  SLEEP_REM,
+  SLEEP_IN_BED,
+  SLEEP_LIGHT,
   SLEEP_OUT_OF_BED,
+  SLEEP_REM,
   SLEEP_SESSION,
+<<<<<<< HEAD:packages/health/lib/src/data_types.dart
   SLEEP_CORE,
   SLEEP_UNSPECIFIED,
+=======
+  SLEEP_UNKNOWN,
+>>>>>>> e01f1322be219b3cdf2267b86ea148648b1d666c:packages/health/lib/src/heath_data_types.dart
   EXERCISE_TIME,
   WORKOUT,
   HEADACHE_NOT_PRESENT,
@@ -50,7 +94,16 @@ enum HealthDataType {
   HEADACHE_MODERATE,
   HEADACHE_SEVERE,
   HEADACHE_UNSPECIFIED,
+<<<<<<< HEAD:packages/health/lib/src/data_types.dart
   VO2MAX,
+=======
+  NUTRITION,
+  // HealthKit Characteristics
+  GENDER,
+  BIRTH_DATE,
+  BLOOD_TYPE,
+  MENSTRUATION_FLOW,
+>>>>>>> e01f1322be219b3cdf2267b86ea148648b1d666c:packages/health/lib/src/heath_data_types.dart
 
   // Heart Rate events (specific to Apple Watch)
   HIGH_HEART_RATE_EVENT,
@@ -58,6 +111,9 @@ enum HealthDataType {
   IRREGULAR_HEART_RATE_EVENT,
   ELECTRODERMAL_ACTIVITY,
   ELECTROCARDIOGRAM,
+
+  // Health Connect
+  TOTAL_CALORIES_BURNED
 }
 
 /// Access types for Health Data.
@@ -67,9 +123,10 @@ enum HealthDataAccess {
   READ_WRITE,
 }
 
-/// List of data types available on iOS
-const List<HealthDataType> _dataTypeKeysIOS = [
+/// List of data types available on iOS.
+const List<HealthDataType> dataTypeKeysIOS = [
   HealthDataType.ACTIVE_ENERGY_BURNED,
+  HealthDataType.ATRIAL_FIBRILLATION_BURDEN,
   HealthDataType.AUDIOGRAM,
   HealthDataType.BASAL_ENERGY_BURNED,
   HealthDataType.BLOOD_GLUCOSE,
@@ -80,14 +137,49 @@ const List<HealthDataType> _dataTypeKeysIOS = [
   HealthDataType.BODY_MASS_INDEX,
   HealthDataType.BODY_TEMPERATURE,
   HealthDataType.DIETARY_CARBS_CONSUMED,
+  HealthDataType.DIETARY_CAFFEINE,
   HealthDataType.DIETARY_ENERGY_CONSUMED,
   HealthDataType.DIETARY_FATS_CONSUMED,
   HealthDataType.DIETARY_PROTEIN_CONSUMED,
+  HealthDataType.DIETARY_FIBER,
+  HealthDataType.DIETARY_SUGAR,
+  HealthDataType.DIETARY_FAT_MONOUNSATURATED,
+  HealthDataType.DIETARY_FAT_POLYUNSATURATED,
+  HealthDataType.DIETARY_FAT_SATURATED,
+  HealthDataType.DIETARY_CHOLESTEROL,
+  HealthDataType.DIETARY_VITAMIN_A,
+  HealthDataType.DIETARY_THIAMIN,
+  HealthDataType.DIETARY_RIBOFLAVIN,
+  HealthDataType.DIETARY_NIACIN,
+  HealthDataType.DIETARY_PANTOTHENIC_ACID,
+  HealthDataType.DIETARY_VITAMIN_B6,
+  HealthDataType.DIETARY_BIOTIN,
+  HealthDataType.DIETARY_VITAMIN_B12,
+  HealthDataType.DIETARY_VITAMIN_C,
+  HealthDataType.DIETARY_VITAMIN_D,
+  HealthDataType.DIETARY_VITAMIN_E,
+  HealthDataType.DIETARY_VITAMIN_K,
+  HealthDataType.DIETARY_FOLATE,
+  HealthDataType.DIETARY_CALCIUM,
+  HealthDataType.DIETARY_CHLORIDE,
+  HealthDataType.DIETARY_IRON,
+  HealthDataType.DIETARY_MAGNESIUM,
+  HealthDataType.DIETARY_PHOSPHORUS,
+  HealthDataType.DIETARY_POTASSIUM,
+  HealthDataType.DIETARY_SODIUM,
+  HealthDataType.DIETARY_ZINC,
+  HealthDataType.DIETARY_CHROMIUM,
+  HealthDataType.DIETARY_COPPER,
+  HealthDataType.DIETARY_IODINE,
+  HealthDataType.DIETARY_MANGANESE,
+  HealthDataType.DIETARY_MOLYBDENUM,
+  HealthDataType.DIETARY_SELENIUM,
   HealthDataType.ELECTRODERMAL_ACTIVITY,
   HealthDataType.FORCED_EXPIRATORY_VOLUME,
   HealthDataType.HEART_RATE,
   HealthDataType.HEART_RATE_VARIABILITY_SDNN,
   HealthDataType.HEIGHT,
+  HealthDataType.INSULIN_DELIVERY,
   HealthDataType.HIGH_HEART_RATE_EVENT,
   HealthDataType.IRREGULAR_HEART_RATE_EVENT,
   HealthDataType.LOW_HEART_RATE_EVENT,
@@ -100,12 +192,22 @@ const List<HealthDataType> _dataTypeKeysIOS = [
   HealthDataType.WEIGHT,
   HealthDataType.FLIGHTS_CLIMBED,
   HealthDataType.DISTANCE_WALKING_RUNNING,
+  HealthDataType.DISTANCE_SWIMMING,
+  HealthDataType.DISTANCE_CYCLING,
   HealthDataType.MINDFULNESS,
+<<<<<<< HEAD:packages/health/lib/src/data_types.dart
   HealthDataType.SLEEP_IN_BED,
   HealthDataType.SLEEP_AWAKE,
   HealthDataType.SLEEP_DEEP,
   HealthDataType.SLEEP_CORE,
   HealthDataType.SLEEP_UNSPECIFIED,
+=======
+  HealthDataType.SLEEP_ASLEEP,
+  HealthDataType.SLEEP_AWAKE,
+  HealthDataType.SLEEP_DEEP,
+  HealthDataType.SLEEP_IN_BED,
+  HealthDataType.SLEEP_LIGHT,
+>>>>>>> e01f1322be219b3cdf2267b86ea148648b1d666c:packages/health/lib/src/heath_data_types.dart
   HealthDataType.SLEEP_REM,
   HealthDataType.WATER,
   HealthDataType.EXERCISE_TIME,
@@ -116,11 +218,19 @@ const List<HealthDataType> _dataTypeKeysIOS = [
   HealthDataType.HEADACHE_SEVERE,
   HealthDataType.HEADACHE_UNSPECIFIED,
   HealthDataType.ELECTROCARDIOGRAM,
+<<<<<<< HEAD:packages/health/lib/src/data_types.dart
   HealthDataType.VO2MAX,
+=======
+  HealthDataType.NUTRITION,
+  HealthDataType.GENDER,
+  HealthDataType.BIRTH_DATE,
+  HealthDataType.BLOOD_TYPE,
+  HealthDataType.MENSTRUATION_FLOW,
+>>>>>>> e01f1322be219b3cdf2267b86ea148648b1d666c:packages/health/lib/src/heath_data_types.dart
 ];
 
 /// List of data types available on Android
-const List<HealthDataType> _dataTypeKeysAndroid = [
+const List<HealthDataType> dataTypeKeysAndroid = [
   HealthDataType.ACTIVE_ENERGY_BURNED,
   HealthDataType.BLOOD_GLUCOSE,
   HealthDataType.BLOOD_OXYGEN,
@@ -129,31 +239,41 @@ const List<HealthDataType> _dataTypeKeysAndroid = [
   HealthDataType.BODY_FAT_PERCENTAGE,
   HealthDataType.BODY_MASS_INDEX,
   HealthDataType.BODY_TEMPERATURE,
+  HealthDataType.BODY_WATER_MASS,
   HealthDataType.HEART_RATE,
+  HealthDataType.HEART_RATE_VARIABILITY_RMSSD,
   HealthDataType.HEIGHT,
   HealthDataType.STEPS,
   HealthDataType.WEIGHT,
-  HealthDataType.MOVE_MINUTES,
   HealthDataType.DISTANCE_DELTA,
-  HealthDataType.SLEEP_AWAKE,
   HealthDataType.SLEEP_ASLEEP,
+  HealthDataType.SLEEP_AWAKE_IN_BED,
+  HealthDataType.SLEEP_AWAKE,
   HealthDataType.SLEEP_DEEP,
   HealthDataType.SLEEP_LIGHT,
-  HealthDataType.SLEEP_REM,
   HealthDataType.SLEEP_OUT_OF_BED,
+  HealthDataType.SLEEP_REM,
   HealthDataType.SLEEP_SESSION,
+  HealthDataType.SLEEP_UNKNOWN,
   HealthDataType.WATER,
   HealthDataType.WORKOUT,
   HealthDataType.RESTING_HEART_RATE,
   HealthDataType.FLIGHTS_CLIMBED,
   HealthDataType.BASAL_ENERGY_BURNED,
   HealthDataType.RESPIRATORY_RATE,
+<<<<<<< HEAD:packages/health/lib/src/data_types.dart
   HealthDataType.VO2MAX,
+=======
+  HealthDataType.NUTRITION,
+  HealthDataType.TOTAL_CALORIES_BURNED,
+  HealthDataType.MENSTRUATION_FLOW,
+>>>>>>> e01f1322be219b3cdf2267b86ea148648b1d666c:packages/health/lib/src/heath_data_types.dart
 ];
 
 /// Maps a [HealthDataType] to a [HealthDataUnit].
-const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
+const Map<HealthDataType, HealthDataUnit> dataTypeToUnit = {
   HealthDataType.ACTIVE_ENERGY_BURNED: HealthDataUnit.KILOCALORIE,
+  HealthDataType.ATRIAL_FIBRILLATION_BURDEN: HealthDataUnit.PERCENT,
   HealthDataType.AUDIOGRAM: HealthDataUnit.DECIBEL_HEARING_LEVEL,
   HealthDataType.BASAL_ENERGY_BURNED: HealthDataUnit.KILOCALORIE,
   HealthDataType.BLOOD_GLUCOSE: HealthDataUnit.MILLIGRAM_PER_DECILITER,
@@ -163,39 +283,84 @@ const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
   HealthDataType.BODY_FAT_PERCENTAGE: HealthDataUnit.PERCENT,
   HealthDataType.BODY_MASS_INDEX: HealthDataUnit.NO_UNIT,
   HealthDataType.BODY_TEMPERATURE: HealthDataUnit.DEGREE_CELSIUS,
+  HealthDataType.BODY_WATER_MASS: HealthDataUnit.KILOGRAM,
   HealthDataType.DIETARY_CARBS_CONSUMED: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_CAFFEINE: HealthDataUnit.GRAM,
   HealthDataType.DIETARY_ENERGY_CONSUMED: HealthDataUnit.KILOCALORIE,
   HealthDataType.DIETARY_FATS_CONSUMED: HealthDataUnit.GRAM,
   HealthDataType.DIETARY_PROTEIN_CONSUMED: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_FIBER: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_SUGAR: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_FAT_MONOUNSATURATED: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_FAT_POLYUNSATURATED: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_FAT_SATURATED: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_CHOLESTEROL: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_A: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_THIAMIN: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_RIBOFLAVIN: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_NIACIN: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_PANTOTHENIC_ACID: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_B6: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_BIOTIN: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_B12: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_C: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_D: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_E: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_VITAMIN_K: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_FOLATE: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_CALCIUM: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_CHLORIDE: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_IRON: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_MAGNESIUM: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_PHOSPHORUS: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_POTASSIUM: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_SODIUM: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_ZINC: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_CHROMIUM: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_COPPER: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_IODINE: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_MANGANESE: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_MOLYBDENUM: HealthDataUnit.GRAM,
+  HealthDataType.DIETARY_SELENIUM: HealthDataUnit.GRAM,
+
   HealthDataType.ELECTRODERMAL_ACTIVITY: HealthDataUnit.SIEMEN,
   HealthDataType.FORCED_EXPIRATORY_VOLUME: HealthDataUnit.LITER,
   HealthDataType.HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
   HealthDataType.RESPIRATORY_RATE: HealthDataUnit.RESPIRATIONS_PER_MINUTE,
   HealthDataType.PERIPHERAL_PERFUSION_INDEX: HealthDataUnit.PERCENT,
   HealthDataType.HEIGHT: HealthDataUnit.METER,
+  HealthDataType.INSULIN_DELIVERY: HealthDataUnit.INTERNATIONAL_UNIT,
   HealthDataType.RESTING_HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
   HealthDataType.STEPS: HealthDataUnit.COUNT,
   HealthDataType.WAIST_CIRCUMFERENCE: HealthDataUnit.METER,
   HealthDataType.WALKING_HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
   HealthDataType.WEIGHT: HealthDataUnit.KILOGRAM,
   HealthDataType.DISTANCE_WALKING_RUNNING: HealthDataUnit.METER,
+  HealthDataType.DISTANCE_SWIMMING: HealthDataUnit.METER,
+  HealthDataType.DISTANCE_CYCLING: HealthDataUnit.METER,
   HealthDataType.FLIGHTS_CLIMBED: HealthDataUnit.COUNT,
-  HealthDataType.MOVE_MINUTES: HealthDataUnit.MINUTE,
   HealthDataType.DISTANCE_DELTA: HealthDataUnit.METER,
   HealthDataType.VO2MAX: HealthDataUnit.VO2MAX_UNIT,
 
 
   HealthDataType.WATER: HealthDataUnit.LITER,
-  HealthDataType.SLEEP_IN_BED: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_ASLEEP: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_AWAKE: HealthDataUnit.MINUTE,
+  HealthDataType.SLEEP_AWAKE_IN_BED: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_DEEP: HealthDataUnit.MINUTE,
+<<<<<<< HEAD:packages/health/lib/src/data_types.dart
   HealthDataType.SLEEP_CORE: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_UNSPECIFIED: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_REM: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_OUT_OF_BED: HealthDataUnit.MINUTE,
+=======
+  HealthDataType.SLEEP_IN_BED: HealthDataUnit.MINUTE,
+>>>>>>> e01f1322be219b3cdf2267b86ea148648b1d666c:packages/health/lib/src/heath_data_types.dart
   HealthDataType.SLEEP_LIGHT: HealthDataUnit.MINUTE,
+  HealthDataType.SLEEP_OUT_OF_BED: HealthDataUnit.MINUTE,
+  HealthDataType.SLEEP_REM: HealthDataUnit.MINUTE,
   HealthDataType.SLEEP_SESSION: HealthDataUnit.MINUTE,
+  HealthDataType.SLEEP_UNKNOWN: HealthDataUnit.MINUTE,
 
   HealthDataType.MINDFULNESS: HealthDataUnit.MINUTE,
   HealthDataType.EXERCISE_TIME: HealthDataUnit.MINUTE,
@@ -207,18 +372,29 @@ const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
   HealthDataType.HEADACHE_SEVERE: HealthDataUnit.MINUTE,
   HealthDataType.HEADACHE_UNSPECIFIED: HealthDataUnit.MINUTE,
 
+  HealthDataType.GENDER: HealthDataUnit.NO_UNIT,
+  HealthDataType.BIRTH_DATE: HealthDataUnit.NO_UNIT,
+  HealthDataType.BLOOD_TYPE: HealthDataUnit.NO_UNIT,
+
   // Heart Rate events (specific to Apple Watch)
   HealthDataType.HIGH_HEART_RATE_EVENT: HealthDataUnit.NO_UNIT,
   HealthDataType.LOW_HEART_RATE_EVENT: HealthDataUnit.NO_UNIT,
   HealthDataType.IRREGULAR_HEART_RATE_EVENT: HealthDataUnit.NO_UNIT,
   HealthDataType.HEART_RATE_VARIABILITY_SDNN: HealthDataUnit.MILLISECOND,
+  HealthDataType.HEART_RATE_VARIABILITY_RMSSD: HealthDataUnit.MILLISECOND,
   HealthDataType.ELECTROCARDIOGRAM: HealthDataUnit.VOLT,
+
+  HealthDataType.NUTRITION: HealthDataUnit.NO_UNIT,
+  HealthDataType.MENSTRUATION_FLOW: HealthDataUnit.NO_UNIT,
+
+  // Health Connect
+  HealthDataType.TOTAL_CALORIES_BURNED: HealthDataUnit.KILOCALORIE,
 };
 
-const PlatformTypeJsonValue = {
-  PlatformType.IOS: 'ios',
-  PlatformType.ANDROID: 'android',
-};
+// const PlatformTypeJsonValue = {
+//   PlatformType.IOS: 'ios',
+//   PlatformType.ANDROID: 'android',
+// };
 
 /// List of all [HealthDataUnit]s.
 enum HealthDataUnit {
@@ -303,29 +479,30 @@ enum HealthDataUnit {
 }
 
 /// List of [HealthWorkoutActivityType]s.
-/// Commented for which platform they are supported
 enum HealthWorkoutActivityType {
+  // Commented for which platform the type are supported
+
   // Both
+  AMERICAN_FOOTBALL,
   ARCHERY,
+  AUSTRALIAN_FOOTBALL,
   BADMINTON,
   BASEBALL,
   BASKETBALL,
   BIKING, // This also entails the iOS version where it is called CYCLING
   BOXING,
   CRICKET,
+  CROSS_COUNTRY_SKIING,
   CURLING,
+  DOWNHILL_SKIING,
   ELLIPTICAL,
   FENCING,
-  AMERICAN_FOOTBALL,
-  AUSTRALIAN_FOOTBALL,
-  SOCCER,
   GOLF,
   GYMNASTICS,
   HANDBALL,
   HIGH_INTENSITY_INTERVAL_TRAINING,
   HIKING,
   HOCKEY,
-  SKATING,
   JUMP_ROPE,
   KICKBOXING,
   MARTIAL_ARTS,
@@ -335,9 +512,9 @@ enum HealthWorkoutActivityType {
   RUGBY,
   RUNNING,
   SAILING,
-  CROSS_COUNTRY_SKIING,
-  DOWNHILL_SKIING,
+  SKATING,
   SNOWBOARDING,
+  SOCCER,
   SOFTBALL,
   SQUASH,
   STAIR_CLIMBING,
@@ -350,115 +527,74 @@ enum HealthWorkoutActivityType {
   YOGA,
 
   // iOS only
-  BOWLING,
-  CROSS_TRAINING,
-  TRACK_AND_FIELD,
-  DISC_SPORTS,
-  LACROSSE,
-  PREPARATION_AND_RECOVERY,
-  FLEXIBILITY,
-  COOLDOWN,
-  WHEELCHAIR_WALK_PACE,
-  WHEELCHAIR_RUN_PACE,
-  HAND_CYCLING,
-  CORE_TRAINING,
-  FUNCTIONAL_STRENGTH_TRAINING,
-  TRADITIONAL_STRENGTH_TRAINING,
-  MIXED_CARDIO,
-  STAIRS,
-  STEP_TRAINING,
-  FITNESS_GAMING,
   BARRE,
+  BOWLING,
   CARDIO_DANCE,
-  SOCIAL_DANCE,
-  MIND_AND_BODY,
-  PICKLEBALL,
   CLIMBING,
+  COOLDOWN,
+  CORE_TRAINING,
+  CROSS_TRAINING,
+  DISC_SPORTS,
   EQUESTRIAN_SPORTS,
   FISHING,
+  FITNESS_GAMING,
+  FLEXIBILITY,
+  FUNCTIONAL_STRENGTH_TRAINING,
+  HAND_CYCLING,
   HUNTING,
-  PLAY,
-  SNOW_SPORTS,
+  LACROSSE,
+  MIND_AND_BODY,
+  MIXED_CARDIO,
   PADDLE_SPORTS,
-  SURFING_SPORTS,
+  PICKLEBALL,
+  PLAY,
+  PREPARATION_AND_RECOVERY,
+  SNOW_SPORTS,
+  SOCIAL_DANCE,
+  STAIRS,
+  STEP_TRAINING,
+  SURFING,
+  TAI_CHI,
+  TRACK_AND_FIELD,
+  TRADITIONAL_STRENGTH_TRAINING,
   WATER_FITNESS,
   WATER_SPORTS,
-  TAI_CHI,
+  WHEELCHAIR_RUN_PACE,
+  WHEELCHAIR_WALK_PACE,
   WRESTLING,
 
   // Android only
-  AEROBICS,
-  BIATHLON,
-  BIKING_HAND,
-  BIKING_MOUNTAIN,
-  BIKING_ROAD,
-  BIKING_SPINNING,
   BIKING_STATIONARY,
-  BIKING_UTILITY,
   CALISTHENICS,
-  CIRCUIT_TRAINING,
-  CROSS_FIT,
   DANCING,
-  DIVING,
-  ELEVATOR,
-  ERGOMETER,
-  ESCALATOR,
   FRISBEE_DISC,
-  GARDENING,
   GUIDED_BREATHING,
-  HORSEBACK_RIDING,
-  HOUSEWORK,
-  INTERVAL_TRAINING,
-  IN_VEHICLE,
   ICE_SKATING,
-  KAYAKING,
-  KETTLEBELL_TRAINING,
-  KICK_SCOOTER,
-  KITE_SURFING,
-  MEDITATION,
-  MIXED_MARTIAL_ARTS,
-  P90X,
   PARAGLIDING,
-  POLO,
   ROCK_CLIMBING, // on iOS this is the same as CLIMBING
   ROWING_MACHINE,
-  RUNNING_JOGGING, // on iOS this is the same as RUNNING
-  RUNNING_SAND, // on iOS this is the same as RUNNING
   RUNNING_TREADMILL, // on iOS this is the same as RUNNING
   SCUBA_DIVING,
-  SKATING_CROSS, // on iOS this is the same as SKATING
-  SKATING_INDOOR, // on iOS this is the same as SKATING
-  SKATING_INLINE, // on iOS this is the same as SKATING
   SKIING,
-  SKIING_BACK_COUNTRY,
-  SKIING_KITE,
-  SKIING_ROLLER,
-  SLEDDING,
-  SNOWMOBILE,
   SNOWSHOEING,
   STAIR_CLIMBING_MACHINE,
-  STANDUP_PADDLEBOARDING,
-  STILL,
   STRENGTH_TRAINING,
-  SURFING,
   SWIMMING_OPEN_WATER,
   SWIMMING_POOL,
-  TEAM_SPORTS,
-  TILTING,
-  VOLLEYBALL_BEACH,
-  VOLLEYBALL_INDOOR,
-  WAKEBOARDING,
-  WALKING_FITNESS,
-  WALKING_NORDIC,
-  WALKING_STROLLER,
   WALKING_TREADMILL,
   WEIGHTLIFTING,
   WHEELCHAIR,
-  WINDSURFING,
-  ZUMBA,
 
   //
   OTHER,
+}
+
+enum MealType {
+  BREAKFAST,
+  LUNCH,
+  DINNER,
+  SNACK,
+  UNKNOWN,
 }
 
 /// Classifications for ECG readings.
@@ -473,27 +609,24 @@ enum ElectrocardiogramClassification {
   UNRECOGNIZED,
 }
 
+/// Types of insulin delivery reason
+enum InsulinDeliveryReason {
+  NOT_SET,
+  BASAL,
+  BOLUS,
+}
+
 /// Extension to assign numbers to [ElectrocardiogramClassification]s
 extension ElectrocardiogramClassificationValue
     on ElectrocardiogramClassification {
-  int get value {
-    switch (this) {
-      case ElectrocardiogramClassification.NOT_SET:
-        return 0;
-      case ElectrocardiogramClassification.SINUS_RHYTHM:
-        return 1;
-      case ElectrocardiogramClassification.ATRIAL_FIBRILLATION:
-        return 2;
-      case ElectrocardiogramClassification.INCONCLUSIVE_LOW_HEART_RATE:
-        return 3;
-      case ElectrocardiogramClassification.INCONCLUSIVE_HIGH_HEART_RATE:
-        return 4;
-      case ElectrocardiogramClassification.INCONCLUSIVE_POOR_READING:
-        return 5;
-      case ElectrocardiogramClassification.INCONCLUSIVE_OTHER:
-        return 6;
-      case ElectrocardiogramClassification.UNRECOGNIZED:
-        return 100;
-    }
-  }
+  int get value => switch (this) {
+        ElectrocardiogramClassification.NOT_SET => 0,
+        ElectrocardiogramClassification.SINUS_RHYTHM => 1,
+        ElectrocardiogramClassification.ATRIAL_FIBRILLATION => 2,
+        ElectrocardiogramClassification.INCONCLUSIVE_LOW_HEART_RATE => 3,
+        ElectrocardiogramClassification.INCONCLUSIVE_HIGH_HEART_RATE => 4,
+        ElectrocardiogramClassification.INCONCLUSIVE_POOR_READING => 5,
+        ElectrocardiogramClassification.INCONCLUSIVE_OTHER => 6,
+        ElectrocardiogramClassification.UNRECOGNIZED => 100,
+      };
 }

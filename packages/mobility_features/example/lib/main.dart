@@ -2,6 +2,7 @@ library mobility_app;
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:carp_background_location/carp_background_location.dart';
 import 'package:mobility_features/mobility_features.dart';
 
@@ -9,12 +10,12 @@ part 'stops_page.dart';
 part 'moves_page.dart';
 part 'places_page.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 Widget entry(String key, String value, Icon icon) {
   return Container(
       padding: const EdgeInsets.all(2),
-      margin: EdgeInsets.all(3),
+      margin: const EdgeInsets.all(3),
       child: ListTile(
         leading: icon,
         title: Text(key),
@@ -25,7 +26,7 @@ Widget entry(String key, String value, Icon icon) {
 String formatDate(DateTime date) => '${date.year}/${date.month}/${date.day}';
 
 String interval(DateTime a, DateTime b) {
-  String pad(int x) => '${x.toString().padLeft(2, '0')}';
+  String pad(int x) => x.toString().padLeft(2, '0');
   return '${pad(a.hour)}:${pad(a.minute)}:${pad(a.second)} - ${pad(b.hour)}:${pad(b.minute)}:${pad(b.second)}';
 }
 
@@ -36,18 +37,20 @@ String formatDuration(Duration duration) {
   return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
 }
 
-final stopIcon = Icon(Icons.my_location);
-final moveIcon = Icon(Icons.directions_walk);
-final placeIcon = Icon(Icons.place);
-final featuresIcon = Icon(Icons.assessment);
-final homeStayIcon = Icon(Icons.home);
-final distanceTravelledIcon = Icon(Icons.card_travel);
-final entropyIcon = Icon(Icons.equalizer);
-final varianceIcon = Icon(Icons.swap_calls);
+const stopIcon = Icon(Icons.my_location);
+const moveIcon = Icon(Icons.directions_walk);
+const placeIcon = Icon(Icons.place);
+const featuresIcon = Icon(Icons.assessment);
+const homeStayIcon = Icon(Icons.home);
+const distanceTraveledIcon = Icon(Icons.card_travel);
+const entropyIcon = Icon(Icons.equalizer);
+const varianceIcon = Icon(Icons.swap_calls);
 
 enum AppState { NO_FEATURES, CALCULATING_FEATURES, FEATURES_READY }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,7 +58,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Mobility Features Example'),
+      home: const HomePage(title: 'Mobility Features Example'),
     );
   }
 }
@@ -63,15 +66,15 @@ class MyApp extends StatelessWidget {
 String dtoToString(LocationDto dto) =>
     '${dto.latitude}, ${dto.longitude} @ ${DateTime.fromMillisecondsSinceEpoch(dto.time ~/ 1)}';
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.title});
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class HomePageState extends State<HomePage> {
   AppState _state = AppState.NO_FEATURES;
 
   int _currentIndex = 0;
@@ -89,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     // Set up Mobility Features
-    MobilityFeatures().stopDuration = Duration(seconds: 20);
+    MobilityFeatures().stopDuration = const Duration(seconds: 20);
     MobilityFeatures().placeRadius = 50.0;
     MobilityFeatures().stopRadius = 5.0;
 
@@ -102,14 +105,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   /// Set up streams:
-  /// * Location streaming to MobilityContext
-  /// * Subscribe to MobilityContext updates
-  void streamInit() async {
-    locationStream = LocationManager().locationStream;
+  ///  * Location streaming to MobilityContext
+  ///  * Subscribe to MobilityContext updates
+  Future<void> streamInit() async {
+    await requestNotificationPermission();
 
-    // subscribe to location stream - in case this is needed in the app
-    //locationSubscription.cancel();
-    locationSubscription = locationStream.listen(onLocationUpdate);
+    // ask for location permissions, if not already granted
+    if (!await isLocationAlwaysGranted()) {
+      await requestLocationPermission();
+      await askForLocationAlwaysPermission();
+    }
+
+    locationStream = LocationManager().locationStream;
 
     // start the location service (specific to carp_background_location)
     await LocationManager().start();
@@ -121,16 +128,59 @@ class _MyHomePageState extends State<MyHomePage> {
             DateTime.now()));
 
     // provide the [MobilityFeatures] instance with the LocationSample stream
-    MobilityFeatures().startListening(locationSampleStream);
+    await MobilityFeatures().startListening(locationSampleStream);
 
     // start listening to incoming MobilityContext objects
     mobilitySubscription =
         MobilityFeatures().contextStream.listen(onMobilityContext);
   }
 
-  /// Called whenever location changes.
-  void onLocationUpdate(LocationDto dto) {
-    print(dtoToString(dto));
+  Future<bool> isLocationAlwaysGranted() async {
+    bool granted = false;
+    try {
+      granted = await Permission.locationAlways.isGranted;
+    } catch (e) {
+      print(e);
+    }
+    return granted;
+  }
+
+  /// Tries to ask for "location always" permissions from the user.
+  /// Returns `true` if successful, `false` otherwise.
+  Future<bool> askForLocationAlwaysPermission() async {
+    bool granted = false;
+    try {
+      granted = await Permission.locationAlways.isGranted;
+    } catch (e) {
+      print(e);
+    }
+
+    if (!granted) {
+      granted =
+          await Permission.locationAlways.request() == PermissionStatus.granted;
+    }
+
+    return granted;
+  }
+
+  Future<void> requestLocationPermission() async {
+    final result = await Permission.location.request();
+
+    if (result == PermissionStatus.granted) {
+      print('GRANTED'); // ignore: avoid_print
+    } else {
+      print('NOT GRANTED'); // ignore: avoid_print
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    final result = await Permission.notification.request();
+
+    if (result == PermissionStatus.granted) {
+      print('NOTIFICATION GRANTED');
+    } else {
+      print('NOTIFICATION NOT GRANTED');
+    }
   }
 
   /// Called whenever mobility context changes.
@@ -152,20 +202,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget get featuresOverview {
     return ListView(
       children: <Widget>[
-        entry("Stops", "${_mobilityContext.stops.length}", stopIcon),
-        entry("Moves", "${_mobilityContext.moves.length}", moveIcon),
+        entry("Stops", "${_mobilityContext.stops?.length}", stopIcon),
+        entry("Moves", "${_mobilityContext.moves?.length}", moveIcon),
         entry("Significant Places",
             "${_mobilityContext.numberOfSignificantPlaces}", placeIcon),
         entry(
             "Home Stay",
-            _mobilityContext.homeStay! < 0
+            _mobilityContext.homeStay == null || _mobilityContext.homeStay! < 0
                 ? "?"
                 : "${(_mobilityContext.homeStay! * 100).toStringAsFixed(1)}%",
             homeStayIcon),
         entry(
-            "Distance Travelled",
-            "${(_mobilityContext.distanceTravelled! / 1000).toStringAsFixed(2)} km",
-            distanceTravelledIcon),
+            "Distance Traveled",
+            "${(_mobilityContext.distanceTraveled! / 1000).toStringAsFixed(2)} km",
+            distanceTraveledIcon),
         entry(
             "Normalized Entropy",
             "${_mobilityContext.normalizedEntropy?.toStringAsFixed(2)}",
@@ -181,8 +231,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> get contentNoFeatures {
     return [
       Container(
-          margin: EdgeInsets.all(25),
-          child: Text(
+          margin: const EdgeInsets.all(25),
+          child: const Text(
             'Move around to start generating features',
             style: TextStyle(fontSize: 20),
           ))
@@ -192,15 +242,15 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> get contentFeaturesReady {
     return [
       Container(
-          margin: EdgeInsets.all(25),
+          margin: const EdgeInsets.all(25),
           child: Column(children: [
-            Text(
+            const Text(
               'Statistics for today,',
               style: TextStyle(fontSize: 20),
             ),
             Text(
-              '${formatDate(_mobilityContext.date)}',
-              style: TextStyle(fontSize: 20, color: Colors.blue),
+              formatDate(_mobilityContext.date!),
+              style: const TextStyle(fontSize: 20, color: Colors.blue),
             ),
           ])),
       Expanded(child: featuresOverview),
@@ -209,10 +259,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget get content {
     List<Widget> children;
-    if (_state == AppState.FEATURES_READY)
+    if (_state == AppState.FEATURES_READY) {
       children = contentFeaturesReady;
-    else
+    } else {
       children = contentNoFeatures;
+    }
     return Column(children: children);
   }
 
@@ -222,19 +273,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Widget _navBar() {
-    return BottomNavigationBar(
-      onTap: onTabTapped, // new
-      currentIndex: _currentIndex, // this will be set when a new tab is tapped
-      type: BottomNavigationBarType.fixed,
-      items: [
-        BottomNavigationBarItem(icon: featuresIcon, label: 'Features'),
-        BottomNavigationBarItem(icon: stopIcon, label: 'Stops'),
-        BottomNavigationBarItem(icon: placeIcon, label: 'Places'),
-        BottomNavigationBarItem(icon: moveIcon, label: 'Moves')
-      ],
-    );
-  }
+  Widget get navBar => BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: featuresIcon, label: 'Features'),
+          BottomNavigationBarItem(icon: stopIcon, label: 'Stops'),
+          BottomNavigationBarItem(icon: placeIcon, label: 'Places'),
+          BottomNavigationBarItem(icon: moveIcon, label: 'Moves')
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -243,14 +292,16 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Place> places = [];
 
     if (_state == AppState.FEATURES_READY) {
-      for (var x in _mobilityContext.stops) print(x);
-      for (var x in _mobilityContext.moves) {
+      for (var x in _mobilityContext.stops!) {
+        print(x);
+      }
+      for (var x in _mobilityContext.moves!) {
         print(x);
         print('${x.stopFrom} --> ${x.stopTo}');
       }
-      stops = _mobilityContext.stops;
-      moves = _mobilityContext.moves;
-      places = _mobilityContext.places;
+      stops = _mobilityContext.stops ?? [];
+      moves = _mobilityContext.moves ?? [];
+      places = _mobilityContext.places ?? [];
     }
 
     List<Widget> pages = [
@@ -263,12 +314,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: pages[_currentIndex],
-      bottomNavigationBar: _navBar(),
+      bottomNavigationBar: navBar,
     );
   }
 }
