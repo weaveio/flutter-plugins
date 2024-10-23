@@ -16,12 +16,3 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
-
-flutter:
-  plugin:
-    platforms:
-      android:
-        package: cachet.plugins.health
-        pluginClass: HealthPlugin
-      ios:
-        pluginClass: HealthPlugin
