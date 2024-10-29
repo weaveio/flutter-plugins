@@ -5,7 +5,7 @@ abstract class HealthValue {
   Map<String, dynamic> toJson();
 }
 
-class HealthFactory {
+class HealthFactoryStub {
   HealthFactory({bool useHealthConnectIfAvailable = false}) {}
   Future<bool> requestAuthorization(
       List<HealthDataType> types, {
